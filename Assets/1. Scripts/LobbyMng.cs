@@ -4,17 +4,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public class LobbyMng : MonoBehaviourPunCallbacks
 {
-    public Text connetTxt;
+    [Header("방 최대인원")]
+    public byte maxPlayer;
 
+    [Header("필요 컴포넌트")]
+    public TextMeshProUGUI connetTxt;
     public Button createBtn, joinBtn, realCreateBtn;
-    public GameObject createTab, joinTab, eventSys, roomBtn;
-
-    public InputField nickInput, roomInput;
-
+    public TMP_InputField nickInput, roomInput;
     public Transform content;
+    public GameObject roomBtn;
+
+    [Header("탭 종류")]
+    public GameObject createTab;
+    public GameObject joinTab;
 
     enum Mode
     {
@@ -45,7 +51,7 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         PhotonNetwork.LocalPlayer.NickName = nickInput.text;
 
         // 새로운 방 만들고 접속
-        PhotonNetwork.CreateRoom(roomInput.text, new RoomOptions { MaxPlayers = 2 });
+        PhotonNetwork.CreateRoom(roomInput.text, new RoomOptions { MaxPlayers = maxPlayer });
 
         connetTxt.text = "방 접속 중...";
 
@@ -143,7 +149,7 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         foreach (var item in myRoomList)
         {
             GameObject room = Instantiate(roomBtn, content);
-            Text roomTxt = room.GetComponentInChildren<Text>();
+            TextMeshProUGUI roomTxt = room.GetComponentInChildren<TextMeshProUGUI>();
 
             string playerCount = $"({item.PlayerCount}/{item.MaxPlayers})";
             roomTxt.text = item.Name + playerCount;

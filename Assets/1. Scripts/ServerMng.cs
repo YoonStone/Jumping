@@ -1,63 +1,78 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public class ServerMng : MonoBehaviourPunCallbacks
 {
+    [Header("í•„ìš” ì»´í¬ë„ŒíŠ¸")]
     public Button startBtn;
-    public Text connetTxt;
+    public TextMeshProUGUI connetTxt;
+
+    [Header("íƒ­ ì¢…ë¥˜")]
     public GameObject lobby;
+
+    [Header("ì´ë¯¸ì§€ ì¢…ë¥˜")]
+    public Texture2D cursor;
+    public Sprite smile;
+
+    Image startImg;
 
     private void Awake()
     {
         startBtn.onClick.AddListener(ClickStartBtn);
+        startImg = startBtn.GetComponent<Image>();
 
-        // ¹æÀåÀº ¾À ·Îµå °¡´É, ¸ğµç ÇÃ·¹ÀÌ¾î´Â ÀÚµ¿À¸·Î µ¿ÀÏÇÑ ¾À ·Îµå
+        // ë°©ì¥ì€ ì”¬ ë¡œë“œ ê°€ëŠ¥, ëª¨ë“  í”Œë ˆì´ì–´ëŠ” ìë™ìœ¼ë¡œ ë™ì¼í•œ ì”¬ ë¡œë“œ
         PhotonNetwork.AutomaticallySyncScene = true;
+
+        // ë¬¼ìŒí‘œ ì»¤ì„œ
+        Cursor.SetCursor(cursor, Vector2.zero, CursorMode.Auto);
     }
 
     void Start()
     {
-        // ¼­¹ö Á¢¼Ó
+        // ì„œë²„ ì ‘ì†
         PhotonNetwork.ConnectUsingSettings();
 
-        connetTxt.text = "¼­¹ö Á¢¼Ó Áß...";
+        connetTxt.text = "ì„œë²„ ì ‘ì† ì¤‘...";
     }
 
     void ClickStartBtn()
     {
-        // ·Îºñ Á¢¼Ó
+        // ë¡œë¹„ ì ‘ì†
         PhotonNetwork.JoinLobby();
 
-        connetTxt.text = "·Îºñ Á¢¼Ó Áß...";
+        connetTxt.text = "ë¡œë¹„ ì ‘ì† ì¤‘...";
     }
 
-    // ¼­¹ö¿¡ Á¢¼ÓµÇ¸é È£Ãâ
+    // ì„œë²„ì— ì ‘ì†ë˜ë©´ í˜¸ì¶œ
     public override void OnConnectedToMaster()
     {
-        connetTxt.text = "¼­¹ö Á¢¼Ó ¿Ï·á";
+        connetTxt.text = "ì„œë²„ ì ‘ì† ì™„ë£Œ";
 
         startBtn.interactable = true;
+        startImg.sprite = smile;
     }
 
-    // ·Îºñ¿¡ Á¢¼ÓµÇ¸é È£Ãâ
+    // ë¡œë¹„ì— ì ‘ì†ë˜ë©´ í˜¸ì¶œ
     public override void OnJoinedLobby()
     {
-        connetTxt.text = "·Îºñ Á¢¼Ó ¿Ï·á";
+        connetTxt.text = "ë¡œë¹„ ì ‘ì† ì™„ë£Œ";
 
         lobby.SetActive(true);
         gameObject.SetActive(false);
     }
 
-    // Á¢¼Ó ½ÇÆĞ½Ã È£Ãâ
+    // ì ‘ì† ì‹¤íŒ¨ì‹œ í˜¸ì¶œ
     public override void OnDisconnected(DisconnectCause cause)
     {
-        connetTxt.text = "Á¢¼Ó ½ÇÆĞ\nÀçÁ¢¼Ó Áß...";
+        connetTxt.text = "ì ‘ì† ì‹¤íŒ¨\nì¬ì ‘ì† ì¤‘...";
 
-        // ¼­¹ö Á¢¼Ó
+        // ì„œë²„ ì ‘ì†
         PhotonNetwork.ConnectUsingSettings();
     }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Photon.Pun;
+using TMPro;
 
 public class RoomBtn : MonoBehaviour
 {
@@ -16,9 +17,9 @@ public class RoomBtn : MonoBehaviour
     {
         // 닉네임 할당
         PhotonNetwork.LocalPlayer.NickName 
-            = GameObject.FindGameObjectWithTag("NickInput").GetComponent<InputField>().text;
+            = GameObject.FindGameObjectWithTag("NickInput").GetComponent<TMP_InputField>().text;
 
-        string roomName = GetComponentInChildren<Text>().text.Split('(')[0];
+        string roomName = GetComponentInChildren<TextMeshProUGUI>().text.Split('(')[0];
         PhotonNetwork.JoinRoom(roomName);
 
         // 씬에 있는 모든 버튼 비활성화
