@@ -6,13 +6,14 @@ using Photon.Pun;
 using System;
 using TMPro;
 
-public class Player_Wait : MonoBehaviour
+public class Player_Play : MonoBehaviour
 {
     Rigidbody2D rigd;
     SpriteRenderer sr;
     PhotonView pv;
 
     public TextMeshProUGUI nickTxt;
+    public GameObject clone;
 
     [Header("점프 효과")]
     public GameObject jumpFX;
@@ -25,11 +26,6 @@ public class Player_Wait : MonoBehaviour
 
         // 닉네임 출력
         nickTxt.text = pv.Owner.NickName;
-
-        // 방장이 아니면 버튼 안 보이게
-        GameObject startBtn = GameObject.Find("StartBtn");
-        if (!PhotonNetwork.IsMasterClient && startBtn)
-            startBtn.SetActive(false);
     }
 
     void Update()
@@ -43,14 +39,27 @@ public class Player_Wait : MonoBehaviour
                 pv.RPC("Jump", RpcTarget.AllBuffered);
             }
 
-
             float h = Input.GetAxisRaw("Horizontal");
             rigd.velocity = new Vector2(h * 5, rigd.velocity.y);
 
 
             // 좌우 반전 전달
-            pv.RPC("SpriteFlipX", RpcTarget.AllBuffered, h);
+            pv.RPC("SpriteFlipX", RpcTarget.All, h);
+
+
+            // 복제 기능 전달
+            if (Input.GetMouseButtonDown(0))
+                pv.RPC("Fire", RpcTarget.All, transform.position, sr.flipX);    
         }
+    }
+
+    #region [RPC 함수]
+    [PunRPC]
+    IEnumerator Jump()
+    {
+        GameObject _jupmFX = Instantiate(jumpFX, transform.position - transform.up * 0.5f, Quaternion.identity);
+        yield return new WaitForSeconds(0.417f);
+        Destroy(_jupmFX);
     }
 
     [PunRPC]
@@ -63,10 +72,11 @@ public class Player_Wait : MonoBehaviour
     }
 
     [PunRPC]
-    IEnumerator Jump()
+    void Fire(Vector3 position, bool isFlipX)
     {
-        GameObject _jupmFX = Instantiate(jumpFX, transform.position - transform.up * 0.5f, Quaternion.identity);
-        yield return new WaitForSeconds(0.417f);
-        Destroy(_jupmFX);
+        GameObject _clone = Instantiate(clone, transform.position, Quaternion.identity);
+        _clone.GetComponent<SpriteRenderer>().flipX = isFlipX;
+        Destroy(_clone, 5f);
     }
+    #endregion
 }

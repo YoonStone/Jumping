@@ -27,7 +27,7 @@ public class PlayManager : MonoBehaviour
 
     void Start()
     {
-        PhotonNetwork.Instantiate("Player", Vector2.zero, Quaternion.identity);
+        PhotonNetwork.Instantiate("Player_Play", Vector2.zero, Quaternion.identity);
         scoreTxt.text = "0:0";
     }
 
