@@ -308,6 +308,9 @@ MonoBehaviour:
   nickTxt: {fileID: 1328650649913970226}
   clone: {fileID: 83847124054630740, guid: c8a2ee92264f6564285e0e8111fad8ca, type: 3}
   jumpFX: {fileID: 7921900016363407308, guid: 851e8d4d5de6a4344b8eb9bfdc14d696, type: 3}
+  canJump:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!114 &662647684463615866
 MonoBehaviour:
   m_ObjectHideFlags: 0

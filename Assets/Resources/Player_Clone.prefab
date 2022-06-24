@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 83847124054630872}
   - component: {fileID: 83847124054630979}
   - component: {fileID: 83847124054630995}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player_Clone
   m_TagString: Player
   m_Icon: {fileID: 0}

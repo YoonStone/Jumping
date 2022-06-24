@@ -44,6 +44,7 @@ MonoBehaviour:
   - Damaged
   - SpriteFlipX
   - Jump
+  - JumpFX
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

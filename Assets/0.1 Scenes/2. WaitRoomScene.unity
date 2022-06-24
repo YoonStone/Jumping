@@ -488,7 +488,7 @@ GameObject:
   - component: {fileID: 414855184}
   - component: {fileID: 414855183}
   - component: {fileID: 414855182}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -768,7 +768,7 @@ GameObject:
   - component: {fileID: 675341246}
   - component: {fileID: 675341245}
   - component: {fileID: 675341244}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -947,7 +947,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1365800814}
   m_OnClick:
     m_PersistentCalls:
@@ -1001,7 +1001,7 @@ GameObject:
   - component: {fileID: 1696573445}
   - component: {fileID: 1696573444}
   - component: {fileID: 1696573446}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}

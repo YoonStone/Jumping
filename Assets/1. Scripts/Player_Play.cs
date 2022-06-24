@@ -15,8 +15,11 @@ public class Player_Play : MonoBehaviour
     public TextMeshProUGUI nickTxt;
     public GameObject clone;
 
-    [Header("점프 효과")]
+    [Header("점프 관련")]
     public GameObject jumpFX;
+    public LayerMask canJump;
+
+    Transform cam;
 
     void Start()
     {
@@ -26,6 +29,10 @@ public class Player_Play : MonoBehaviour
 
         // 닉네임 출력
         nickTxt.text = pv.Owner.NickName;
+
+        // 카메라 가져오기
+        if (pv.IsMine)
+            cam = Camera.main.transform;
     }
 
     void Update()
@@ -35,8 +42,15 @@ public class Player_Play : MonoBehaviour
             // 점프 + 이동
             if (Input.GetButtonDown("Jump"))
             {
-                rigd.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-                pv.RPC("Jump", RpcTarget.AllBuffered);
+                Vector3 rayStart
+                    = new Vector3(transform.position.x - 0.5f, transform.position.y - 0.6f, transform.position.x);
+                Debug.DrawRay(rayStart, transform.right, Color.red);
+
+                if (Physics2D.Raycast(rayStart, transform.right, 1, canJump))
+                {
+                    rigd.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+                    pv.RPC("JumpFX", RpcTarget.AllBuffered);
+                }
             }
 
             float h = Input.GetAxisRaw("Horizontal");
@@ -44,7 +58,8 @@ public class Player_Play : MonoBehaviour
 
 
             // 좌우 반전 전달
-            pv.RPC("SpriteFlipX", RpcTarget.All, h);
+            if (h != 0)
+                pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
 
 
             // 복제 기능 전달
@@ -53,9 +68,14 @@ public class Player_Play : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        cam.position = new Vector3(cam.position.x, transform.position.y, cam.position.z);
+    }
+
     #region [RPC 함수]
     [PunRPC]
-    IEnumerator Jump()
+    IEnumerator JumpFX()
     {
         GameObject _jupmFX = Instantiate(jumpFX, transform.position - transform.up * 0.5f, Quaternion.identity);
         yield return new WaitForSeconds(0.417f);
