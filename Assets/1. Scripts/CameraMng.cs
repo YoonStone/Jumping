@@ -8,7 +8,13 @@ public class CameraMng : MonoBehaviour
     public Vector2 center;
     public Vector2 size;
 
-    Vector2 centerC, sizeC;
+    [Header("카메라 이동 속도")]
+    public float speed;
+
+    Vector2 sizeC;
+
+    public Transform player;
+
 
     void Start()
     {
@@ -16,9 +22,20 @@ public class CameraMng : MonoBehaviour
         sizeC.x = Screen.width * sizeC.y / Screen.height;
     }
 
-    void Update()
+    void LateUpdate()
     {
-         
+        if (player) 
+        {
+            transform.position = Vector3.Lerp(transform.position, player.position, speed * Time.deltaTime);
+
+            float offsetY = size.y * 0.5f - sizeC.y;
+            float offsetX = size.x * 0.5f - sizeC.x;
+
+            float clampY = Mathf.Clamp(transform.position.y, center.y - offsetY, center.y + offsetY);
+            float clampX = Mathf.Clamp(transform.position.x, center.x - offsetX, center.x + offsetX);
+
+            transform.position = new Vector3(clampX, clampY, -10);
+        }
     }
 
     private void OnDrawGizmos()

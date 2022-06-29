@@ -745,8 +745,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7524bebe5212646a2ecd1f6a9f315f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 42, z: 0}
-  size: {x: 18, y: 102.9, z: 0}
+  center: {x: 0, y: 42}
+  size: {x: 23, y: 102.9}
+  speed: 6
+  player: {fileID: 0}
 --- !u!1 &1253355152
 GameObject:
   m_ObjectHideFlags: 0

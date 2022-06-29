@@ -32,7 +32,9 @@ public class Player_Play : MonoBehaviour
 
         // 카메라 가져오기
         if (pv.IsMine)
-            cam = Camera.main.transform;
+        {
+            Camera.main.GetComponent<CameraMng>().player = transform;
+        }
     }
 
     void Update()
@@ -66,11 +68,6 @@ public class Player_Play : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
                 pv.RPC("Fire", RpcTarget.All, transform.position, sr.flipX);    
         }
-    }
-
-    private void LateUpdate()
-    {
-        cam.position = new Vector3(cam.position.x, transform.position.y, cam.position.z);
     }
 
     #region [RPC 함수]
