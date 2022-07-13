@@ -21,4 +21,11 @@ public class Player_Clone : MonoBehaviour
 
         sr.flipX = flipX;
     }
+
+    public void Active()
+    {
+        GetComponent<BoxCollider2D>().isTrigger = false;
+        originColor.a = 1f;
+        sr.color = originColor;
+    }
 }

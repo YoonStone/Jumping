@@ -74,6 +74,14 @@ public class Player_Play : MonoBehaviour
         }
     }
 
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (pv.IsMine && collision.CompareTag("Player"))
+        {
+            collision.GetComponent<Player_Clone>().Active();
+        }
+    }
+
     #region [RPC 함수]
     [PunRPC]
     IEnumerator JumpFX()

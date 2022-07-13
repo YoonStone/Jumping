@@ -124,3 +124,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8f17febe70bd2445a4ce5ff0be4681c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  originColor: {r: 0, g: 0, b: 0, a: 0}
+  flipX: 0
