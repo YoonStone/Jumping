@@ -19,7 +19,7 @@ public class Player_Play : MonoBehaviour
     public GameObject jumpFX;
     public LayerMask canJump;
 
-    Transform cam;
+    public Color[] colors;
 
     void Start()
     {
@@ -30,9 +30,13 @@ public class Player_Play : MonoBehaviour
         // 닉네임 출력
         nickTxt.text = pv.Owner.NickName;
 
-        // 카메라 가져오기
+        // 색상 적용
+        ExitGames.Client.Photon.Hashtable color = pv.Owner.CustomProperties;
+        sr.color = colors[(int)color["color"]];
+
         if (pv.IsMine)
         {
+            // 카메라 가져오기
             Camera.main.GetComponent<CameraMng>().player = transform;
         }
     }
@@ -66,7 +70,7 @@ public class Player_Play : MonoBehaviour
 
             // 복제 기능 전달
             if (Input.GetMouseButtonDown(0))
-                pv.RPC("Fire", RpcTarget.All, transform.position, sr.flipX);    
+                pv.RPC("Fire", RpcTarget.All);    
         }
     }
 
@@ -89,11 +93,12 @@ public class Player_Play : MonoBehaviour
     }
 
     [PunRPC]
-    void Fire(Vector3 position, bool isFlipX)
+    void Fire()
     {
-        GameObject _clone = Instantiate(clone, transform.position, Quaternion.identity);
-        _clone.GetComponent<SpriteRenderer>().flipX = isFlipX;
-        Destroy(_clone, 5f);
+        Player_Clone _clone = Instantiate(clone, transform.position, Quaternion.identity).GetComponent<Player_Clone>();
+        _clone.flipX = sr.flipX;
+        _clone.originColor = sr.color;
+        Destroy(_clone.gameObject, 5f);
     }
     #endregion
 }

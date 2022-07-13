@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
@@ -9,6 +10,7 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI countTxt;
     public Button startBtn;
+    public Button[] colorBtns;
 
     private void Awake()
     {

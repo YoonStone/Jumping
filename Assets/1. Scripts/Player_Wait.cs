@@ -18,12 +18,27 @@ public class Player_Wait : MonoBehaviour
     public GameObject jumpFX;
     public LayerMask canJump;
 
-    void Start()
+    public Color[] colors;
+
+    public Button[] colorBtns;
+
+    private void Awake()
     {
         rigd = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         pv = GetComponent<PhotonView>();
 
+        colorBtns = FindObjectOfType<WaitRoomMng>().colorBtns;
+
+        for (int i = 0; i < colorBtns.Length; i++)
+        {
+            int _i = i;
+            colorBtns[_i].onClick.AddListener(() => ClickBtn(_i));
+        }
+    }
+
+    void Start()
+    {
         // 닉네임 출력
         nickTxt.text = pv.Owner.NickName;
 
@@ -31,6 +46,7 @@ public class Player_Wait : MonoBehaviour
         GameObject startBtn = GameObject.Find("StartBtn");
         if (!PhotonNetwork.IsMasterClient && startBtn)
             startBtn.SetActive(false);
+
     }
 
     void Update()
@@ -58,7 +74,16 @@ public class Player_Wait : MonoBehaviour
 
             // 좌우 반전 전달
             if(h != 0)
-                pv.RPC("SpriteFlipX", RpcTarget.AllBuffered, h);
+                pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
+        }
+    }
+
+    void ClickBtn(int num)
+    {
+        if (pv.IsMine)
+        {
+            pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", num } });
+            pv.RPC("ClickColorBtn", RpcTarget.AllBufferedViaServer, num);
         }
     }
 
@@ -77,5 +102,13 @@ public class Player_Wait : MonoBehaviour
         GameObject _jupmFX = Instantiate(jumpFX, transform.position - transform.up * 0.5f, Quaternion.identity);
         yield return new WaitForSeconds(0.417f);
         Destroy(_jupmFX);
+    }
+
+    [PunRPC]
+    void ClickColorBtn(int num)
+    {
+        Debug.LogError($"번호 : {num}\n버튼개수 : {colorBtns.Length}\n색상개수 : {colors.Length}");
+        colorBtns[num].interactable = false;
+        sr.color = colors[num];
     }
 }
