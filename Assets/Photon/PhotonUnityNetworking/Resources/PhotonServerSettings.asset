@@ -47,6 +47,10 @@ MonoBehaviour:
   - JumpFX
   - ClickBtn
   - ClickColorBtn
+  - SendActive
+  - ActiveClone
+  - SetClone
+  - DestoryClone
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

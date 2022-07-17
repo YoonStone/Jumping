@@ -70,7 +70,11 @@ public class Player_Play : MonoBehaviour
 
             // 복제 기능 전달
             if (Input.GetMouseButtonDown(0))
-                pv.RPC("Fire", RpcTarget.All);    
+            {
+                Player_Clone _clone = PhotonNetwork.Instantiate("Player_Clone", transform.position, Quaternion.identity).GetComponent<Player_Clone>();
+                int viewID = _clone.GetComponent<PhotonView>().ViewID;
+                pv.RPC("SetClone", RpcTarget.All, viewID);
+            }
         }
     }
 
@@ -101,12 +105,17 @@ public class Player_Play : MonoBehaviour
     }
 
     [PunRPC]
-    void Fire()
+    void SetClone(int viewID) // 클론 초기설정
     {
-        Player_Clone _clone = Instantiate(clone, transform.position, Quaternion.identity).GetComponent<Player_Clone>();
+        Player_Clone _clone = PhotonView.Find(viewID).gameObject.GetComponent<Player_Clone>();
         _clone.flipX = sr.flipX;
         _clone.originColor = sr.color;
-        Destroy(_clone.gameObject, 5f);
+    }
+
+    [PunRPC]
+    void ActiveClone(int viewID)
+    {
+        print("클론활성화_플레이어");
     }
     #endregion
 }
