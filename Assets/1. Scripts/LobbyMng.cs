@@ -8,17 +8,17 @@ using TMPro;
 
 public class LobbyMng : MonoBehaviourPunCallbacks
 {
-    [Header("¹æ ÃÖ´ëÀÎ¿ø")]
+    [Header("ë°© ìµœëŒ€ì¸ì›")]
     public byte maxPlayer;
 
-    [Header("ÇÊ¿ä ÄÄÆ÷³ÍÆ®")]
+    [Header("í•„ìš” ì»´í¬ë„ŒíŠ¸")]
     public TextMeshProUGUI connetTxt;
     public Button createBtn, joinBtn, realCreateBtn;
     public TMP_InputField nickInput, roomInput;
     public Transform content;
     public GameObject roomBtn;
 
-    [Header("ÅÇ Á¾·ù")]
+    [Header("íƒ­ ì¢…ë¥˜")]
     public GameObject createTab;
     public GameObject joinTab;
 
@@ -47,15 +47,15 @@ public class LobbyMng : MonoBehaviourPunCallbacks
 
     void ClickRealCBtn()
     {
-        // ´Ğ³×ÀÓ ÇÒ´ç
+        // ë‹‰ë„¤ì„ í• ë‹¹
         PhotonNetwork.LocalPlayer.NickName = nickInput.text;
 
-        // »õ·Î¿î ¹æ ¸¸µé°í Á¢¼Ó
+        // ìƒˆë¡œìš´ ë°© ë§Œë“¤ê³  ì ‘ì†
         PhotonNetwork.CreateRoom(roomInput.text, new RoomOptions { MaxPlayers = maxPlayer });
 
-        connetTxt.text = "¹æ Á¢¼Ó Áß...";
+        connetTxt.text = "ë°© ì ‘ì† ì¤‘...";
 
-        // ¹öÆ° ºñÈ°¼ºÈ­
+        // ë²„íŠ¼ ë¹„í™œì„±í™”
         BtnInteract(false);
     }
 
@@ -66,7 +66,7 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         mode = Mode.Join;
     }
 
-    // ¹öÆ°ÀÇ »óÈ£ÀÛ¿ë °ü¸®
+    // ë²„íŠ¼ì˜ ìƒí˜¸ì‘ìš© ê´€ë¦¬
     public void BtnInteract(bool isTrue)
     {
         Button[] btns = FindObjectsOfType<Button>();
@@ -83,14 +83,14 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         {
             case Mode.None: break;
 
-            case Mode.Create:       // ¹æ¸¸µé±â¸ğµå
+            case Mode.Create:       // ë°©ë§Œë“¤ê¸°ëª¨ë“œ
                 if (nickInput.text != "" && roomInput.text != "")
                     realCreateBtn.interactable = true;
                 else
                     realCreateBtn.interactable = false;
                 break;
 
-            case Mode.Join:         // ¹æÂü°¡¸ğµå
+            case Mode.Join:         // ë°©ì°¸ê°€ëª¨ë“œ
                 if (nickInput.text != "")
                     for (int i = 0; i < content.childCount; i++)
                         content.GetChild(i).GetComponent<Button>().interactable = true;
@@ -101,42 +101,42 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         }
     }
 
-    #region // Æ÷Åæ Äİ¹é ÇÔ¼ö
+    #region // í¬í†¤ ì½œë°± í•¨ìˆ˜
 
-    // ¹æ Á¢¼Ó ¼º°ø ½Ã È£Ãâ
+    // ë°© ì ‘ì† ì„±ê³µ ì‹œ í˜¸ì¶œ
     public override void OnJoinedRoom()
     {
-        // ¾À ÀüÈ¯
+        // ì”¬ ì „í™˜
         PhotonNetwork.LoadLevel("2. WaitRoomScene");
     }
 
-    // ¹æ »ı¼º ½ÇÆĞ ½Ã È£Ãâ
+    // ë°© ìƒì„± ì‹¤íŒ¨ ì‹œ í˜¸ì¶œ
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
-        connetTxt.text = "¹æ Á¢¼Ó ½ÇÆĞ";
+        connetTxt.text = "ë°© ì ‘ì† ì‹¤íŒ¨";
 
-        // ¹öÆ° È°¼ºÈ­
+        // ë²„íŠ¼ í™œì„±í™”
         BtnInteract(true);
     }
 
-    // ¹æ Á¢¼Ó ½ÇÆĞ ½Ã È£Ãâ
+    // ë°© ì ‘ì† ì‹¤íŒ¨ ì‹œ í˜¸ì¶œ
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
-        connetTxt.text = "¹æ Á¢¼Ó ½ÇÆĞ";
+        connetTxt.text = "ë°© ì ‘ì† ì‹¤íŒ¨";
 
-        // ¹öÆ° È°¼ºÈ­
+        // ë²„íŠ¼ í™œì„±í™”
         BtnInteract(true);
     }
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        // ¹æ ¸ñ·Ï ÀÏ´Ü ÃÊ±âÈ­
+        // ë°© ëª©ë¡ ì¼ë‹¨ ì´ˆê¸°í™”
         for (int i = 0; i < content.childCount; i++)
         {
             Destroy(content.GetChild(i).gameObject);
         }
 
-        // µû·Î ¹æ ¸ñ·Ï °ü¸® (ÀÖ´ø°Å¸é »èÁ¦, ¾ø´ø°Å¸é Ãß°¡)
+        // ë”°ë¡œ ë°© ëª©ë¡ ê´€ë¦¬ (ìˆë˜ê±°ë©´ ì‚­ì œ, ì—†ë˜ê±°ë©´ ì¶”ê°€)
         foreach (var item in roomList)
         {
             if (myRoomList.Contains(item))
@@ -145,7 +145,7 @@ public class LobbyMng : MonoBehaviourPunCallbacks
                 myRoomList.Add(item);
         }
 
-        // µû·Î °ü¸®ÇÏ´Â ¹æ¸ñ·Ï´ë·Î »ı¼º
+        // ë”°ë¡œ ê´€ë¦¬í•˜ëŠ” ë°©ëª©ë¡ëŒ€ë¡œ ìƒì„±
         foreach (var item in myRoomList)
         {
             GameObject room = Instantiate(roomBtn, content);
