@@ -110,6 +110,7 @@ public class Player_Play : MonoBehaviour
         Player_Clone _clone = PhotonView.Find(viewID).gameObject.GetComponent<Player_Clone>();
         _clone.flipX = sr.flipX;
         _clone.originColor = sr.color;
+        _clone.originID = pv.ViewID;
     }
 
     [PunRPC]

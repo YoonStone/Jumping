@@ -36,7 +36,7 @@ public class Player_Clone : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other) 
     {
-        // ** 내꺼랑 부딪혀도 없어짐 **
+        // 다른 플레이어랑 부딪히면 삭제 전달
         if(other.collider.GetComponent<PhotonView>().ViewID != originID)
             pv.RPC("DestoryClone", RpcTarget.All);
     }
