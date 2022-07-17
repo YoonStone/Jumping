@@ -22,6 +22,8 @@ public class Player_Wait : MonoBehaviour
 
     public Button[] colorBtns;
 
+    int curBtn;
+
     private void Awake()
     {
         rigd = GetComponent<Rigidbody2D>();
@@ -83,7 +85,9 @@ public class Player_Wait : MonoBehaviour
         if (pv.IsMine)
         {
             pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", num } });
-            pv.RPC("ClickColorBtn", RpcTarget.AllBufferedViaServer, num);
+            pv.RPC("ClickColorBtn", RpcTarget.AllBufferedViaServer, curBtn, num);
+
+            curBtn = num;
         }
     }
 
@@ -105,9 +109,11 @@ public class Player_Wait : MonoBehaviour
     }
 
     [PunRPC]
-    void ClickColorBtn(int num)
+    void ClickColorBtn(int cur, int num)
     {
         Debug.LogError($"번호 : {num}\n버튼개수 : {colorBtns.Length}\n색상개수 : {colors.Length}");
+        
+        colorBtns[cur].interactable = true; // 이전 버튼 활성화
         colorBtns[num].interactable = false;
         sr.color = colors[num];
     }
