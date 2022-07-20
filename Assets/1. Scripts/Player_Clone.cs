@@ -41,7 +41,7 @@ public class Player_Clone : MonoBehaviour
             pv.RPC("DestoryClone", RpcTarget.All);
     }
 
-#region [RPC 함수]
+    #region [RPC 함수]
     [PunRPC]
     void ActiveClone() // 클론 활성화
     {
@@ -61,5 +61,5 @@ public class Player_Clone : MonoBehaviour
     {
         Destroy(gameObject);
     }
-#endregion
+    #endregion
 }

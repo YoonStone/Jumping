@@ -5,8 +5,9 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System;
 using TMPro;
+using ExitGames.Client.Photon;
 
-public class Player_Wait : MonoBehaviour
+public class Player_Wait : MonoBehaviourPunCallbacks
 {
     Rigidbody2D rigd;
     SpriteRenderer sr;
@@ -23,6 +24,8 @@ public class Player_Wait : MonoBehaviour
     public Button[] colorBtns;
 
     int curBtn;
+
+    GameObject startBtn; // 다음 방장이 될 수도 있으므로
 
     private void Awake()
     {
@@ -45,10 +48,32 @@ public class Player_Wait : MonoBehaviour
         nickTxt.text = pv.Owner.NickName;
 
         // 방장이 아니면 버튼 안 보이게
-        GameObject startBtn = GameObject.Find("StartBtn");
+        startBtn = GameObject.Find("StartBtn");
         if (!PhotonNetwork.IsMasterClient && startBtn)
             startBtn.SetActive(false);
 
+        if (pv.IsMine)
+        {
+            if (PhotonNetwork.IsMasterClient)
+                FirstColor();
+            else // 방장이 아니면 딜레이
+                Invoke("FirstColor", 0.1f);
+        }
+    }
+
+    // 랜덤으로 시작 색상 고르기
+    void FirstColor()
+    {
+        for (int i = 0; i < colorBtns.Length; i++)
+        {
+            if (colorBtns[i].interactable)
+            {
+                pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", i } });
+                pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, i);
+                curBtn = i;
+                break;
+            }
+        }
     }
 
     void Update()
@@ -77,6 +102,11 @@ public class Player_Wait : MonoBehaviour
             // 좌우 반전 전달
             if(h != 0)
                 pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
+          
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                PhotonNetwork.LeaveRoom();
+            }
         }
     }
 
@@ -85,12 +115,13 @@ public class Player_Wait : MonoBehaviour
         if (pv.IsMine)
         {
             pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", num } });
-            pv.RPC("ClickColorBtn", RpcTarget.AllBufferedViaServer, curBtn, num);
+            pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, false, curBtn, num);
 
             curBtn = num;
         }
     }
 
+    #region [RPC 함수]
     [PunRPC]
     void SpriteFlipX(float h)
     {
@@ -109,12 +140,25 @@ public class Player_Wait : MonoBehaviour
     }
 
     [PunRPC]
-    void ClickColorBtn(int cur, int num)
+    void ClickColorBtn(bool isFirst, int cur, int num)
     {
-        Debug.LogError($"번호 : {num}\n버튼개수 : {colorBtns.Length}\n색상개수 : {colors.Length}");
-        
-        colorBtns[cur].interactable = true; // 이전 버튼 활성화
+        if(!isFirst)
+            colorBtns[cur].interactable = true; // 이전 버튼 활성화
+       
         colorBtns[num].interactable = false;
         sr.color = colors[num];
     }
+    #endregion
+
+    #region [포톤 콜백 함수]
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        if (otherPlayer.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
+            PhotonNetwork.LoadLevel("1. LobbyScene");
+
+        // 내가 다음 차례 방장이라면 버튼 on
+        if (pv.IsMine && PhotonNetwork.IsMasterClient)
+            startBtn.SetActive(true);
+    }
+    #endregion
 }

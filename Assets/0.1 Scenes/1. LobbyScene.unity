@@ -960,7 +960,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8449d4dbd35dbd449bd0b98b4c37298e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxPlayer: 2
+  maxPlayer: 3
   connetTxt: {fileID: 1311663524}
   createBtn: {fileID: 291934688}
   joinBtn: {fileID: 739182571}

@@ -101,7 +101,7 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         }
     }
 
-    #region // 포톤 콜백 함수
+    #region [포톤 콜백 함수]
 
     // 방 접속 성공 시 호출
     public override void OnJoinedRoom()

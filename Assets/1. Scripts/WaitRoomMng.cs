@@ -30,6 +30,7 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
             = PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
     }
 
+    #region [포톤 콜백 함수]
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
@@ -50,5 +51,15 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
 
         if (playerCount != maxPlayers)
             startBtn.interactable = false;
+
+        // 떠난 플레이어가 갖고 있던 색상 활성화
+        ExitGames.Client.Photon.Hashtable color = otherPlayer.CustomProperties;
+        colorBtns[(int)color["color"]].interactable = true;
     }
+
+    public override void OnLeftRoom()
+    {
+        PhotonNetwork.LoadLevel("1. LobbyScene");
+    }
+    #endregion
 }
