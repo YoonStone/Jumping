@@ -305,6 +305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d2d4844d51c2c4ba9e4b600e19a5d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pv: {fileID: 0}
   nickTxt: {fileID: 1328650649913970226}
   clone: {fileID: 83847124054630740, guid: c8a2ee92264f6564285e0e8111fad8ca, type: 3}
   jumpFX: {fileID: 7921900016363407308, guid: 851e8d4d5de6a4344b8eb9bfdc14d696, type: 3}

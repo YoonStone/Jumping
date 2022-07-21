@@ -24,8 +24,11 @@ public class Player_Wait : MonoBehaviourPunCallbacks
     public Button[] colorBtns;
 
     int curBtn;
+    bool isEsc;
 
+    WaitRoomMng waitRoomMng;
     GameObject startBtn; // 다음 방장이 될 수도 있으므로
+    Button escBtn;
 
     private void Awake()
     {
@@ -33,13 +36,16 @@ public class Player_Wait : MonoBehaviourPunCallbacks
         sr = GetComponent<SpriteRenderer>();
         pv = GetComponent<PhotonView>();
 
-        colorBtns = FindObjectOfType<WaitRoomMng>().colorBtns;
+        waitRoomMng = FindObjectOfType<WaitRoomMng>();
+        colorBtns = waitRoomMng.colorBtns;
+        escBtn = waitRoomMng.escBtn;
 
         for (int i = 0; i < colorBtns.Length; i++)
         {
             int _i = i;
             colorBtns[_i].onClick.AddListener(() => ClickBtn(_i));
         }
+        escBtn.onClick.AddListener(ClickESC);
     }
 
     void Start()
@@ -103,9 +109,18 @@ public class Player_Wait : MonoBehaviourPunCallbacks
             if(h != 0)
                 pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
           
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) && !isEsc)
             {
-                PhotonNetwork.LeaveRoom();
+                Vector3 curSize = escBtn.transform.localScale;
+
+                if (escBtn.gameObject.activeSelf)
+                {
+                    StartCoroutine(CloseESC(curSize));
+                }
+                else
+                {
+                    StartCoroutine(OpenESC(curSize));
+                }
             }
         }
     }
@@ -119,6 +134,42 @@ public class Player_Wait : MonoBehaviourPunCallbacks
 
             curBtn = num;
         }
+    }
+
+    void ClickESC()
+    {
+        if (pv.IsMine)
+            PhotonNetwork.LeaveRoom();
+    }
+
+    IEnumerator OpenESC(Vector3 curSize)
+    {
+        isEsc = true;
+        escBtn.gameObject.SetActive(true);
+        float timer = 0;
+
+        while (timer < 1)
+        {
+            timer += Time.deltaTime * 2f;
+            escBtn.transform.localScale = Vector3.Lerp(curSize, Vector3.one, timer);
+            yield return null;
+        }
+        isEsc = false;
+    }
+
+    IEnumerator CloseESC(Vector3 curSize)
+    {
+        isEsc = true;
+        float timer = 0;
+
+        while (timer < 1)
+        {
+            timer += Time.deltaTime * 2f;
+            escBtn.transform.localScale = Vector3.Lerp(curSize, Vector3.zero, timer);
+            yield return null;
+        }
+        escBtn.gameObject.SetActive(false);
+        isEsc = false;
     }
 
     #region [RPC 함수]

@@ -9,7 +9,7 @@ using TMPro;
 public class WaitRoomMng : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI countTxt;
-    public Button startBtn;
+    public Button startBtn, escBtn;
     public Button[] colorBtns;
 
     private void Awake()

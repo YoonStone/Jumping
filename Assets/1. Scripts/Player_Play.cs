@@ -10,7 +10,7 @@ public class Player_Play : MonoBehaviour
 {
     Rigidbody2D rigd;
     SpriteRenderer sr;
-    PhotonView pv;
+    public PhotonView pv;
 
     public TextMeshProUGUI nickTxt;
     public GameObject clone;
@@ -20,13 +20,22 @@ public class Player_Play : MonoBehaviour
     public LayerMask canJump;
 
     public Color[] colors;
+   
+    bool isEsc;
+    Button escBtn;
 
-    void Start()
+    private void Awake()
     {
         rigd = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
         pv = GetComponent<PhotonView>();
 
+        escBtn = PlayManager.instance.escBtn;        
+        escBtn.onClick.AddListener(ClickESC);
+    }
+
+    void Start()
+    {
         // 닉네임 출력
         nickTxt.text = pv.Owner.NickName;
 
@@ -43,7 +52,7 @@ public class Player_Play : MonoBehaviour
 
     void Update()
     {
-        if (pv.IsMine)
+        if (pv.IsMine && PlayManager.instance.isCanMove)
         {
             // 점프 + 이동
             if (Input.GetButtonDown("Jump"))
@@ -75,6 +84,20 @@ public class Player_Play : MonoBehaviour
                 int viewID = _clone.GetComponent<PhotonView>().ViewID;
                 pv.RPC("SetClone", RpcTarget.All, viewID);
             }
+
+            if (Input.GetKeyDown(KeyCode.Escape) && !isEsc)
+            {
+                Vector3 curSize = escBtn.transform.localScale;
+
+                if (escBtn.gameObject.activeSelf)
+                {
+                    StartCoroutine(CloseESC(curSize));
+                }
+                else
+                {
+                    StartCoroutine(OpenESC(curSize));
+                }
+            }
         }
     }
 
@@ -84,6 +107,42 @@ public class Player_Play : MonoBehaviour
         {
             collision.GetComponent<Player_Clone>().Active();
         }
+    }
+
+    void ClickESC()
+    {
+        if (pv.IsMine)
+            PhotonNetwork.LeaveRoom();
+    }
+
+    IEnumerator OpenESC(Vector3 curSize)
+    {
+        isEsc = true;
+        escBtn.gameObject.SetActive(true);
+        float timer = 0;
+
+        while (timer < 1)
+        {
+            timer += Time.deltaTime * 2f;
+            escBtn.transform.localScale = Vector3.Lerp(curSize, Vector3.one, timer);
+            yield return null;
+        }
+        isEsc = false;
+    }
+
+    IEnumerator CloseESC(Vector3 curSize)
+    {
+        isEsc = true;
+        float timer = 0;
+
+        while (timer < 1)
+        {
+            timer += Time.deltaTime * 2f;
+            escBtn.transform.localScale = Vector3.Lerp(curSize, Vector3.zero, timer);
+            yield return null;
+        }
+        escBtn.gameObject.SetActive(false);
+        isEsc = false;
     }
 
     #region [RPC 함수]
