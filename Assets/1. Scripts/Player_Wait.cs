@@ -60,16 +60,28 @@ public class Player_Wait : MonoBehaviourPunCallbacks
 
         if (pv.IsMine)
         {
-            if (PhotonNetwork.IsMasterClient)
-                FirstColor();
-            else // 방장이 아니면 딜레이
-                Invoke("FirstColor", 0.1f);
+            // 원래 저장되어있던 색이 있다면 = 대기실로 돌아온 것
+            ExitGames.Client.Photon.Hashtable color = pv.Owner.CustomProperties;
+            if (color["color"] != null)
+            {
+                sr.color = colors[(int)color["color"]];
+                pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, (int)color["color"]);
+            }
+            // 원래 저장되어있던 색이 없다면 = 새로 생긴 대기실
+            else
+            {
+                if (PhotonNetwork.IsMasterClient)
+                    FirstColor();
+                else // 방장이 아니면 딜레이
+                    Invoke("FirstColor", 0.1f);
+            }
         }
     }
 
     // 랜덤으로 시작 색상 고르기
     void FirstColor()
     {
+        print("처음임");
         for (int i = 0; i < colorBtns.Length; i++)
         {
             if (colorBtns[i].interactable)
@@ -204,9 +216,6 @@ public class Player_Wait : MonoBehaviourPunCallbacks
     #region [포톤 콜백 함수]
     public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
     {
-        if (otherPlayer.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber)
-            PhotonNetwork.LoadLevel("1. LobbyScene");
-
         // 내가 다음 차례 방장이라면 버튼 on
         if (pv.IsMine && PhotonNetwork.IsMasterClient)
             startBtn.SetActive(true);

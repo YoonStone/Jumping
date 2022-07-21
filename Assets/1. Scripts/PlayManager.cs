@@ -7,32 +7,27 @@ using TMPro;
 
 public class PlayManager : MonoBehaviour
 {
-    public Button escBtn;
+    public Button escBtn, backBtn;
     public TextMeshProUGUI countTxt, timerTxt;
     public Image[] playerImgs;
     public TextMeshProUGUI[] rankTxts;
-    public Image[] faileds;
     public RectTransform rankingView;
     public GameObject winner;
     public Color[] colors;
 
     public bool isCanMove;
 
-    public static PlayManager instance;
-
     public Player_Play[] players;
     public string[] ranks;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        backBtn.onClick.AddListener(ClickBackBtn);
+    }
+
+    void ClickBackBtn()
+    {
+        PhotonNetwork.LoadLevel("2. WaitRoomScene");
     }
 
     void Start()
@@ -134,7 +129,7 @@ public class PlayManager : MonoBehaviour
             yield return null;
         }
 
-
+        // 가장 높은 사람 번호 찾기
         int biggest = 0;
         for (int i = 0; i < rankTxts.Length; i++)
         {
@@ -148,22 +143,22 @@ public class PlayManager : MonoBehaviour
             }
         }
 
-        for (int i = 0; i < faileds.Length; i++)
-            faileds[i].gameObject.SetActive(true);
-
-        timer = 0;
-        while (timer < 1)
+        timer = 1;
+        while (timer > 0)
         {
-            timer += Time.unscaledDeltaTime;
-            for (int i = 0; i < faileds.Length; i++)
+            timer -= Time.unscaledDeltaTime;
+            for (int i = 0; i < playerImgs.Length; i++)
             {
                 if(i != biggest)
-                    faileds[i].color = new Vector4(faileds[i].color.r, faileds[i].color.g, faileds[i].color.b, timer);
+                {
+                    playerImgs[i].color = new Vector4(playerImgs[i].color.r, playerImgs[i].color.g, playerImgs[i].color.b, timer);
+                    rankTxts[i].color = new Vector4(rankTxts[i].color.r, rankTxts[i].color.g, rankTxts[i].color.b, timer);
+                }
             }
             yield return null;
         }
 
         winner.SetActive(true);
-        //rankTxts[0].text = $"<color=#B02121>{ranks[0]}</color>";
+        backBtn.gameObject.SetActive(true);
     }
 }

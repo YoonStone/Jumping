@@ -22,7 +22,8 @@ public class Player_Play : MonoBehaviour
     public Color[] colors;
    
     bool isEsc;
-    Button escBtn;
+    Button escBtn, backBtn;
+    PlayManager pm;
 
     private void Awake()
     {
@@ -30,8 +31,11 @@ public class Player_Play : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         pv = GetComponent<PhotonView>();
 
-        escBtn = PlayManager.instance.escBtn;        
+        pm = FindObjectOfType<PlayManager>();
+        escBtn = pm.escBtn;
+        backBtn = pm.backBtn;
         escBtn.onClick.AddListener(ClickESC);
+        backBtn.onClick.AddListener(ClickESC);
     }
 
     void Start()
@@ -52,7 +56,10 @@ public class Player_Play : MonoBehaviour
 
     void Update()
     {
-        if (pv.IsMine && PlayManager.instance.isCanMove)
+        if (!pv.IsMine)
+            return;
+
+        if (pm.isCanMove)
         {
             // 점프 + 이동
             if (Input.GetButtonDown("Jump"))
@@ -98,6 +105,10 @@ public class Player_Play : MonoBehaviour
                     StartCoroutine(OpenESC(curSize));
                 }
             }
+        }
+        else if(pm.winner.activeSelf && PhotonNetwork.IsMasterClient)
+        {
+            pm.backBtn.gameObject.SetActive(true);
         }
     }
 

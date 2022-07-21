@@ -14,6 +14,7 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
 
     private void Awake()
     {
+        Time.timeScale = 1;
         startBtn.onClick.AddListener(ClickStartBtn);
     }
 
@@ -24,6 +25,7 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        Time.timeScale = 1;
         PhotonNetwork.Instantiate("Player_Wait", Vector2.zero, Quaternion.identity);
 
         countTxt.text

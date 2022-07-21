@@ -51,6 +51,8 @@ MonoBehaviour:
   - ActiveClone
   - SetClone
   - DestoryClone
+  - BackBtn
+  - GameEnd
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
