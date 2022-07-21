@@ -11,7 +11,9 @@ public class PlayManager : MonoBehaviour
     public TextMeshProUGUI countTxt, timerTxt;
     public Image[] playerImgs;
     public TextMeshProUGUI[] rankTxts;
-    public RectTransform ranking, rankingView;
+    public Image[] faileds;
+    public RectTransform rankingView;
+    public GameObject winner;
     public Color[] colors;
 
     public bool isCanMove;
@@ -38,9 +40,6 @@ public class PlayManager : MonoBehaviour
         for (int i = 0; i < PhotonNetwork.CurrentRoom.PlayerCount; i++)
         {
             playerImgs[i].gameObject.SetActive(true);
-            //ExitGames.Client.Photon.Hashtable color = PhotonNetwork.CurrentRoom.GetPlayer(i).CustomProperties;
-            //playerImgs[i].color = colors[(int)color["color"]];
-
             rankTxts[i].gameObject.SetActive(true);
         }
 
@@ -95,7 +94,7 @@ public class PlayManager : MonoBehaviour
         isCanMove = true;
     }
 
-    float timer = 5;
+    float timer = 2;
 
     private void Update()
     {
@@ -113,28 +112,21 @@ public class PlayManager : MonoBehaviour
                 return;
             }
 
+            // 현재 높이 출력
             for (int i = 0; i < players.Length; i++)
-            {
                 rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
-            }
         }
     }
 
     IEnumerator Ending()
     {
         // 랭킹화면 옮기기
-        rankingView.gameObject.SetActive(true);
-        rankingView.SetParent(ranking.parent);
-        for (int i = 0; i < ranking.childCount; i++)
-            ranking.GetChild(i).SetParent(rankingView);
-        ranking.gameObject.SetActive(false);
-
-        // ** 내 순위표만 남는 오류있음**
+        rankingView.SetParent(rankingView.parent.parent);
 
         // 서서히 가운데로 오면서 커지기
         Vector3 curPos = rankingView.anchoredPosition;
         float timer = 0;
-        while(timer < 1)
+        while (timer < 1)
         {
             timer += Time.unscaledDeltaTime;
             rankingView.anchoredPosition = Vector3.Lerp(curPos, Vector3.zero, timer);
@@ -142,6 +134,36 @@ public class PlayManager : MonoBehaviour
             yield return null;
         }
 
+
+        int biggest = 0;
+        for (int i = 0; i < rankTxts.Length; i++)
+        {
+            for (int j = i + 1; j < rankTxts.Length; j++)
+            {
+                if (float.Parse(rankTxts[i].text.Remove(4)) > float.Parse(rankTxts[j].text.Remove(4)) 
+                    && float.Parse(rankTxts[i].text.Remove(4)) > float.Parse(rankTxts[biggest].text.Remove(4)))
+                {
+                    biggest = i;
+                }
+            }
+        }
+
+        for (int i = 0; i < faileds.Length; i++)
+            faileds[i].gameObject.SetActive(true);
+
+        timer = 0;
+        while (timer < 1)
+        {
+            timer += Time.unscaledDeltaTime;
+            for (int i = 0; i < faileds.Length; i++)
+            {
+                if(i != biggest)
+                    faileds[i].color = new Vector4(faileds[i].color.r, faileds[i].color.g, faileds[i].color.b, timer);
+            }
+            yield return null;
+        }
+
+        winner.SetActive(true);
         //rankTxts[0].text = $"<color=#B02121>{ranks[0]}</color>";
     }
 }
