@@ -5,25 +5,55 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+using System.Text.RegularExpressions;
 
 public class WaitRoomMng : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI countTxt;
+    public InputField timer;
     public Button startBtn, escBtn;
     public Button[] colorBtns;
+
+    public bool isSeleted;
 
     private void Awake()
     {
         Time.timeScale = 1;
         startBtn.onClick.AddListener(ClickStartBtn);
+        timer.onEndEdit.AddListener(IPEditEnd);
+    }
+
+    public string curText = "60";
+
+    void IPEditEnd(string text)
+    {
+        timer.text = Regex.Replace(text, @"[^0-9]", "");
+
+        // 0ì´ ì•„ë‹ ë•Œë„ í¬í•¨ **
+        if (text == "0" || text == "" || text == null || timer.text.Length == 0)
+            timer.text = curText;
+        else
+            curText = timer.text;
     }
 
     void ClickStartBtn()
     {
+        // ì œí•œ ì‹œê°„
+        float setTimer = float.Parse(timer.text);
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "timer", setTimer } });
+        startBtn.gameObject.SetActive(false);
+
+        Invoke("StartDelay", 0.1f);
+    }
+
+    void StartDelay()
+    {
         PhotonNetwork.LoadLevel("3. PlayScene");
     }
 
-    void Start()
+    private void Start()
     {
         Time.timeScale = 1;
         PhotonNetwork.Instantiate("Player_Wait", Vector2.zero, Quaternion.identity);
@@ -32,7 +62,7 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
             = PhotonNetwork.CurrentRoom.PlayerCount + "/" + PhotonNetwork.CurrentRoom.MaxPlayers;
     }
 
-    #region [Æ÷Åæ Äİ¹é ÇÔ¼ö]
+    #region [í¬í†¤ ì½œë°± í•¨ìˆ˜]
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
     {
         int playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
@@ -54,8 +84,8 @@ public class WaitRoomMng : MonoBehaviourPunCallbacks
         if (playerCount != maxPlayers)
             startBtn.interactable = false;
 
-        // ¶°³­ ÇÃ·¹ÀÌ¾î°¡ °®°í ÀÖ´ø »ö»ó È°¼ºÈ­
-        ExitGames.Client.Photon.Hashtable color = otherPlayer.CustomProperties;
+        // ë– ë‚œ í”Œë ˆì´ì–´ê°€ ê°–ê³  ìˆë˜ ìƒ‰ìƒ í™œì„±í™”
+        Hashtable color = otherPlayer.CustomProperties;
         colorBtns[(int)color["color"]].interactable = true;
     }
 

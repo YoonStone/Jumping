@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Player_Play : MonoBehaviour
 {
@@ -44,8 +45,8 @@ public class Player_Play : MonoBehaviour
         nickTxt.text = pv.Owner.NickName;
 
         // 색상 적용
-        ExitGames.Client.Photon.Hashtable color = pv.Owner.CustomProperties;
-        sr.color = colors[(int)color["color"]];
+        Hashtable playerPp = pv.Owner.CustomProperties;
+        sr.color = colors[(int)playerPp["color"]];
 
         if (pv.IsMine)
         {

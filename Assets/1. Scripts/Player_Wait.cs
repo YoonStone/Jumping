@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using System;
 using TMPro;
-using ExitGames.Client.Photon;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class Player_Wait : MonoBehaviourPunCallbacks
 {
@@ -61,11 +61,11 @@ public class Player_Wait : MonoBehaviourPunCallbacks
         if (pv.IsMine)
         {
             // 원래 저장되어있던 색이 있다면 = 대기실로 돌아온 것
-            ExitGames.Client.Photon.Hashtable color = pv.Owner.CustomProperties;
-            if (color["color"] != null)
+            Hashtable playerPp = pv.Owner.CustomProperties;
+            if (playerPp["color"] != null)
             {
-                sr.color = colors[(int)color["color"]];
-                pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, (int)color["color"]);
+                sr.color = colors[(int)playerPp["color"]];
+                pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, (int)playerPp["color"]);
             }
             // 원래 저장되어있던 색이 없다면 = 새로 생긴 대기실
             else
@@ -86,7 +86,7 @@ public class Player_Wait : MonoBehaviourPunCallbacks
         {
             if (colorBtns[i].interactable)
             {
-                pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", i } });
+                pv.Owner.SetCustomProperties(new Hashtable { { "color", i } });
                 pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, i);
                 curBtn = i;
                 break;
@@ -141,7 +141,7 @@ public class Player_Wait : MonoBehaviourPunCallbacks
     {
         if (pv.IsMine)
         {
-            pv.Owner.SetCustomProperties(new ExitGames.Client.Photon.Hashtable { { "color", num } });
+            pv.Owner.SetCustomProperties(new Hashtable { { "color", num } });
             pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, false, curBtn, num);
 
             curBtn = num;

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class LobbyMng : MonoBehaviourPunCallbacks
 {
@@ -50,8 +51,12 @@ public class LobbyMng : MonoBehaviourPunCallbacks
         // 닉네임 할당
         PhotonNetwork.LocalPlayer.NickName = nickInput.text;
 
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = maxPlayer;
+        roomOptions.CustomRoomProperties = new Hashtable() { { "timer", 60f } };
+
         // 새로운 방 만들고 접속
-        PhotonNetwork.CreateRoom(roomInput.text, new RoomOptions { MaxPlayers = maxPlayer });
+        PhotonNetwork.CreateRoom(roomInput.text, roomOptions);
 
         connetTxt.text = "방 접속 중...";
 

@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayManager : MonoBehaviour
 {
+    public Image panel;
     public Button escBtn, backBtn;
     public TextMeshProUGUI countTxt, timerTxt;
     public Image[] playerImgs;
@@ -19,6 +21,8 @@ public class PlayManager : MonoBehaviour
 
     public Player_Play[] players;
     public string[] ranks;
+
+    float timer;
 
     private void Awake()
     {
@@ -45,7 +49,21 @@ public class PlayManager : MonoBehaviour
 
     IEnumerator StartCount()
     {
-        float timer = 0;
+        float timer = 1;
+        while (timer > 0)
+        {
+            timer -= Time.deltaTime;
+            panel.color = new Vector4(panel.color.r, panel.color.g, panel.color.b, timer);
+            yield return null;
+        }
+
+        // ì‹œê°„ ì œí•œ ì ìš©
+        Hashtable roomPp = PhotonNetwork.CurrentRoom.CustomProperties;
+        this.timer = (float)roomPp["timer"];
+        timerTxt.text = this.timer.ToString();
+
+        // 3,2,1 ì¹´ìš´íŠ¸
+        timer = 0;
         countTxt.text = "3";
         while (timer < 1)
         {
@@ -72,24 +90,22 @@ public class PlayManager : MonoBehaviour
             yield return null;
         }
 
+        // ì‹œì‘ í‘œì‹œ + í”Œë ˆì´ì–´ ìˆœìœ„í‘œ ì‹œì‘
         countTxt.text = "start!";
         countTxt.fontSize = 350;
 
         players = FindObjectsOfType<Player_Play>();
         for (int i = 0; i < players.Length; i++)
         {
-            ExitGames.Client.Photon.Hashtable color = players[i].pv.Owner.CustomProperties;
+            Hashtable color = players[i].pv.Owner.CustomProperties;
             playerImgs[i].color = colors[(int)color["color"]];
         }
 
         yield return new WaitForSeconds(1);
-
         countTxt.gameObject.SetActive(false);
         ranks = new string[players.Length];
         isCanMove = true;
     }
-
-    float timer = 2;
 
     private void Update()
     {
@@ -98,7 +114,7 @@ public class PlayManager : MonoBehaviour
             timer -= Time.deltaTime;
             timerTxt.text = timer.ToString("00");
 
-            // 60ÃÊ°¡ Áö³ª°í ³ª¸é
+            // 60ì´ˆê°€ ì§€ë‚˜ê³  ë‚˜ë©´
             if (timerTxt.text == "00")
             {
                 isCanMove = false;
@@ -107,18 +123,23 @@ public class PlayManager : MonoBehaviour
                 return;
             }
 
-            // ÇöÀç ³ôÀÌ Ãâ·Â
+            // í˜„ì¬ ë†’ì´ ì¶œë ¥ (ë‚˜ê°„ í”Œë ˆì´ì–´ëŠ” -ë¡œ í‘œì‹œ)
             for (int i = 0; i < players.Length; i++)
-                rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
+            {
+                if(players[i])
+                    rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
+                else
+                    rankTxts[i].text = "-";
+            }
         }
     }
 
     IEnumerator Ending()
     {
-        // ·©Å·È­¸é ¿Å±â±â
+        // ë­í‚¹í™”ë©´ ì˜®ê¸°ê¸°
         rankingView.SetParent(rankingView.parent.parent);
 
-        // ¼­¼­È÷ °¡¿îµ¥·Î ¿À¸é¼­ Ä¿Áö±â
+        // ì„œì„œíˆ ê°€ìš´ë°ë¡œ ì˜¤ë©´ì„œ ì»¤ì§€ê¸°
         Vector3 curPos = rankingView.anchoredPosition;
         float timer = 0;
         while (timer < 1)
@@ -129,17 +150,22 @@ public class PlayManager : MonoBehaviour
             yield return null;
         }
 
-        // °¡Àå ³ôÀº »ç¶÷ ¹øÈ£ Ã£±â
+        // ê°€ì¥ ë†’ì€ ì‚¬ëŒ ë²ˆí˜¸ ì°¾ê¸°
         int biggest = 0;
         for (int i = 0; i < rankTxts.Length; i++)
         {
             for (int j = i + 1; j < rankTxts.Length; j++)
             {
-                if (float.Parse(rankTxts[i].text.Remove(4)) > float.Parse(rankTxts[j].text.Remove(4)) 
-                    && float.Parse(rankTxts[i].text.Remove(4)) > float.Parse(rankTxts[biggest].text.Remove(4)))
-                {
+                // ë‘˜ ì¤‘ì— í•˜ë‚˜ë¼ë„ ë‚˜ê°„ í”Œë ˆì´ì–´ë¼ë©´ ë¹„êµ íŒ¨ìŠ¤
+                if(rankTxts[i].text == "-" || rankTxts[j].text == "-")
+                    continue;
+
+                float curRank = float.Parse(rankTxts[i].text.Remove(4));
+                float preRank = float.Parse(rankTxts[j].text.Remove(4));
+                float bigRank = float.Parse(rankTxts[biggest].text.Remove(4));
+
+                if (curRank > preRank && curRank > bigRank)
                     biggest = i;
-                }
             }
         }
 
