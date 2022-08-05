@@ -29,6 +29,7 @@ public class PlayManager : MonoBehaviour
         backBtn.onClick.AddListener(ClickBackBtn);
     }
 
+    // 종료 버튼
     void ClickBackBtn()
     {
         PhotonNetwork.LoadLevel("2. WaitRoomScene");
@@ -47,6 +48,7 @@ public class PlayManager : MonoBehaviour
         StartCoroutine(StartCount());
     }
 
+    // 시작 이벤트
     IEnumerator StartCount()
     {
         float timer = 1;
@@ -109,31 +111,32 @@ public class PlayManager : MonoBehaviour
 
     private void Update()
     {
-        if (isCanMove)
+        if (!isCanMove)
+            return;
+
+        timer -= Time.deltaTime;
+        timerTxt.text = timer.ToString("00");
+
+        // 60초가 지나고 나면
+        if (timerTxt.text == "00")
         {
-            timer -= Time.deltaTime;
-            timerTxt.text = timer.ToString("00");
+            isCanMove = false;
+            Time.timeScale = 0;
+            StartCoroutine(Ending());
+            return;
+        }
 
-            // 60초가 지나고 나면
-            if (timerTxt.text == "00")
-            {
-                isCanMove = false;
-                Time.timeScale = 0;
-                StartCoroutine(Ending());
-                return;
-            }
-
-            // 현재 높이 출력 (나간 플레이어는 -로 표시)
-            for (int i = 0; i < players.Length; i++)
-            {
-                if(players[i])
-                    rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
-                else
-                    rankTxts[i].text = "-";
-            }
+        // 현재 높이 출력 (나간 플레이어는 -로 표시)
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i])
+                rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
+            else
+                rankTxts[i].text = "날아갔습니다.";
         }
     }
 
+    // 종료 이벤트
     IEnumerator Ending()
     {
         // 랭킹화면 옮기기
@@ -169,6 +172,7 @@ public class PlayManager : MonoBehaviour
             }
         }
 
+        // 점수 가장 높은 사람 빼고 사라지기
         timer = 1;
         while (timer > 0)
         {

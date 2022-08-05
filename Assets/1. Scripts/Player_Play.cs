@@ -1,13 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Photon.Pun;
-using System;
 using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class Player_Play : MonoBehaviour
+public class Player_Play : MonoBehaviourPunCallbacks
 {
     Rigidbody2D rigd;
     SpriteRenderer sr;
@@ -62,69 +62,72 @@ public class Player_Play : MonoBehaviour
 
         if (pm.isCanMove)
         {
-            // 점프 + 이동
-            if (Input.GetButtonDown("Jump"))
+            // Esc창 열려있으면 이동/복제 불가능
+            if (!escBtn.gameObject.activeSelf)
             {
-                Vector3 rayStart
-                    = new Vector3(transform.position.x - 0.5f, transform.position.y - 0.6f, transform.position.x);
-                Debug.DrawRay(rayStart, transform.right, Color.red);
-
-                if (Physics2D.Raycast(rayStart, transform.right, 1, canJump))
+                // 점프 + 이동
+                if (Input.GetButtonDown("Jump"))
                 {
-                    rigd.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
-                    pv.RPC("JumpFX", RpcTarget.AllBuffered);
+                    Vector3 rayStart
+                        = new Vector3(transform.position.x - 0.5f, transform.position.y - 0.6f, transform.position.x);
+                    Debug.DrawRay(rayStart, transform.right, Color.red);
+
+                    if (Physics2D.Raycast(rayStart, transform.right, 1, canJump))
+                    {
+                        rigd.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+                        pv.RPC("JumpFX", RpcTarget.AllBuffered);
+                    }
+                }
+
+                float h = Input.GetAxisRaw("Horizontal");
+                rigd.velocity = new Vector2(h * 5, rigd.velocity.y);
+
+
+                // 좌우 반전 전달
+                if (h != 0)
+                    pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
+
+
+                // 복제 기능 전달
+                if (Input.GetMouseButtonDown(0))
+                {
+                    Player_Clone _clone = PhotonNetwork.Instantiate("Player_Clone", transform.position, Quaternion.identity).GetComponent<Player_Clone>();
+                    int viewID = _clone.GetComponent<PhotonView>().ViewID;
+                    pv.RPC("SetClone", RpcTarget.All, viewID);
                 }
             }
 
-            float h = Input.GetAxisRaw("Horizontal");
-            rigd.velocity = new Vector2(h * 5, rigd.velocity.y);
-
-
-            // 좌우 반전 전달
-            if (h != 0)
-                pv.RPC("SpriteFlipX", RpcTarget.AllBufferedViaServer, h);
-
-
-            // 복제 기능 전달
-            if (Input.GetMouseButtonDown(0))
-            {
-                Player_Clone _clone = PhotonNetwork.Instantiate("Player_Clone", transform.position, Quaternion.identity).GetComponent<Player_Clone>();
-                int viewID = _clone.GetComponent<PhotonView>().ViewID;
-                pv.RPC("SetClone", RpcTarget.All, viewID);
-            }
-
+            // ESC 창
             if (Input.GetKeyDown(KeyCode.Escape) && !isEsc)
             {
                 Vector3 curSize = escBtn.transform.localScale;
 
                 if (escBtn.gameObject.activeSelf)
-                {
                     StartCoroutine(CloseESC(curSize));
-                }
                 else
-                {
                     StartCoroutine(OpenESC(curSize));
-                }
             }
         }
+
+        // 게임이 완료되면
         else if(pm.winner.activeSelf && PhotonNetwork.IsMasterClient)
-        {
             pm.backBtn.gameObject.SetActive(true);
-        }
     }
 
+    // 충돌이 끝나면 클론 활성화
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (pv.IsMine && collision.CompareTag("Player"))
-        {
             collision.GetComponent<Player_Clone>().Active();
-        }
     }
 
     void ClickESC()
     {
         if (pv.IsMine)
+        {
             PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene("1. LobbyScene");
+        }
     }
 
     IEnumerator OpenESC(Vector3 curSize)
@@ -190,4 +193,10 @@ public class Player_Play : MonoBehaviour
         print("클론활성화_플레이어");
     }
     #endregion
+
+    // **방 나가는 부분이 계속 막힘
+    public override void OnLeftRoom()
+    {
+        print("방나감");
+    }
 }

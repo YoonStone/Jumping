@@ -6,41 +6,28 @@ using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
-using System.Text.RegularExpressions;
 
 public class WaitRoomMng : MonoBehaviourPunCallbacks
 {
     public TextMeshProUGUI countTxt;
-    public InputField timer;
+    public TMP_Dropdown timer;
     public Button startBtn, escBtn;
     public Button[] colorBtns;
 
     public bool isSeleted;
 
+    int[] dropDown = { 120, 90, 60, 45, 30, 15, 10, 5 };
+
     private void Awake()
     {
         Time.timeScale = 1;
         startBtn.onClick.AddListener(ClickStartBtn);
-        timer.onEndEdit.AddListener(IPEditEnd);
-    }
-
-    public string curText = "60";
-
-    void IPEditEnd(string text)
-    {
-        timer.text = Regex.Replace(text, @"[^0-9]", "");
-
-        // 0이 아닐 때도 포함 **
-        if (text == "0" || text == "" || text == null || timer.text.Length == 0)
-            timer.text = curText;
-        else
-            curText = timer.text;
     }
 
     void ClickStartBtn()
     {
         // 제한 시간
-        float setTimer = float.Parse(timer.text);
+        float setTimer = dropDown[timer.value];
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(new Hashtable() { { "timer", setTimer } });
         startBtn.gameObject.SetActive(false);
