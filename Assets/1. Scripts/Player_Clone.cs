@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.Rendering.Universal;
 
 public class Player_Clone : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class Player_Clone : MonoBehaviour
     [HideInInspector]
     public int originID;
 
+    public Light2D light2d;
+
     SpriteRenderer sr;
     PhotonView pv;
 
@@ -22,6 +25,7 @@ public class Player_Clone : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
         pv = GetComponent<PhotonView>();
 
+        light2d.color = originColor;
         originColor.a = 0.5f;
         sr.color = originColor;
         sr.flipX = flipX;

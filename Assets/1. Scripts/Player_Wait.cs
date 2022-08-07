@@ -6,14 +6,12 @@ using Photon.Pun;
 using System;
 using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using UnityEngine.Rendering.Universal;
 
 public class Player_Wait : MonoBehaviourPunCallbacks
 {
-    Rigidbody2D rigd;
-    SpriteRenderer sr;
-    PhotonView pv;
-
     public TextMeshProUGUI nickTxt;
+    public Light2D light;
 
     [Header("점프 관련")]
     public GameObject jumpFX;
@@ -25,6 +23,10 @@ public class Player_Wait : MonoBehaviourPunCallbacks
 
     int curBtn;
     bool isEsc;
+
+    Rigidbody2D rigd;
+    SpriteRenderer sr;
+    PhotonView pv;
 
     WaitRoomMng waitRoomMng;
     GameObject startBtn; // 다음 방장이 될 수도 있으므로
@@ -65,6 +67,7 @@ public class Player_Wait : MonoBehaviourPunCallbacks
             if (playerPp["color"] != null)
             {
                 sr.color = colors[(int)playerPp["color"]];
+                light.color = colors[(int)playerPp["color"]];
                 pv.RPC("ClickColorBtn", RpcTarget.AllBuffered, true, curBtn, (int)playerPp["color"]);
             }
             // 원래 저장되어있던 색이 없다면 = 새로 생긴 대기실
@@ -81,7 +84,6 @@ public class Player_Wait : MonoBehaviourPunCallbacks
     // 랜덤으로 시작 색상 고르기
     void FirstColor()
     {
-        print("처음임");
         for (int i = 0; i < colorBtns.Length; i++)
         {
             if (colorBtns[i].interactable)
@@ -210,6 +212,7 @@ public class Player_Wait : MonoBehaviourPunCallbacks
        
         colorBtns[num].interactable = false;
         sr.color = colors[num];
+        light.color = colors[num];
     }
     #endregion
 

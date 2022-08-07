@@ -6,14 +6,14 @@ using UnityEngine.UI;
 using Photon.Pun;
 using TMPro;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
+using UnityEngine.Rendering.Universal;
 
 public class Player_Play : MonoBehaviourPunCallbacks
 {
-    Rigidbody2D rigd;
-    SpriteRenderer sr;
     public PhotonView pv;
 
     public TextMeshProUGUI nickTxt;
+    public Light2D light;
     public GameObject clone;
 
     [Header("점프 관련")]
@@ -23,6 +23,9 @@ public class Player_Play : MonoBehaviourPunCallbacks
     public Color[] colors;
    
     bool isEsc;
+
+    Rigidbody2D rigd;
+    SpriteRenderer sr;
     Button escBtn, backBtn;
     PlayManager pm;
 
@@ -47,6 +50,7 @@ public class Player_Play : MonoBehaviourPunCallbacks
         // 색상 적용
         Hashtable playerPp = pv.Owner.CustomProperties;
         sr.color = colors[(int)playerPp["color"]];
+        light.color = colors[(int)playerPp["color"]];
 
         if (pv.IsMine)
         {

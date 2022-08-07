@@ -117,7 +117,7 @@ public class PlayManager : MonoBehaviour
         timer -= Time.deltaTime;
         timerTxt.text = timer.ToString("00");
 
-        // 60초가 지나고 나면
+        // 시간이 지나고 나면
         if (timerTxt.text == "00")
         {
             isCanMove = false;
@@ -132,7 +132,7 @@ public class PlayManager : MonoBehaviour
             if (players[i])
                 rankTxts[i].text = (players[i].transform.position.y + 10).ToString("00.0") + "km";
             else
-                rankTxts[i].text = "날아갔습니다.";
+                rankTxts[i].text = "너무 멀리 날아갔습니다.";
         }
     }
 
